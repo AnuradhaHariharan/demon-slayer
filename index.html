@@ -8,15 +8,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
  <body>
-        <div class="container">
-            <h1>Tanjiro's Snake and Ladder Game</h1>
-            <div id="game-board"></div>
-            <div id="controls">
-                <button id="roll-dice-btn">Roll Dice</button>
-                <p id="dice-result">Dice: </p>
-                <p id="player-position">Tanjiro's Position: 1</p>
-            </div>
-        </div>
+    <h1> Tanjiro's Journey to Save Nezuko</h1>
+    <div id="board"></div>
+    <button onclick="rollDice()" class="button">Next move</button>
+    <p id="diceResult"></p>
+    <button onclick="resetGame()" class="button">Start over</button>
         <script src="scripts.js"></script>
 </body>
 </html>

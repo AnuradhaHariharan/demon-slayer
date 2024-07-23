@@ -1,136 +1,100 @@
-const boardSize = 10; // Adjusted for a 10x10 board
-const totalCells = boardSize * boardSize;
-const board = document.getElementById('game-board');
-const rollDiceBtn = document.getElementById('roll-dice-btn');
-const diceResult = document.getElementById('dice-result');
-const playerPositionText = document.getElementById('player-position');
-
-let playerPosition = 1;
-
+const totalCells = 100;
 const snakes = {
-    38: 20,
-    84: 28,
-    86: 36,
-    91: 67,
-    19: 38,
-    27: 83,
-    54:56
+    16: 6,
+    47: 37,
+    49: 39,
+    56: 46,
+    62: 52,
+    64: 54,
+    87: 77,
+    93: 83,
+    98: 88
 };
 
 const ladders = {
-    3: 13,
-    11: 26,
-    17: 29,
-    39: 59,
-    94: 72,
-    97: 78
+    4: 14,
+    9: 19,
+    21: 31,
+    28: 38,
+    36: 46,
+    51: 61,
+    71: 81,
 };
 
-const demons = {
-    25: true, // Example demon positions, can be static
-    50: true,
-    14: true,
-    31: true,
-
-};
-let a=1;
+let playerPosition = 1;
 
 function createBoard() {
+    const board = document.getElementById('board');
+    board.innerHTML = '';
+
     for (let i = totalCells; i > 0; i--) {
         const cell = document.createElement('div');
-        console.log("working");
-        cell.textContent = a++;
+        cell.textContent = i;
 
-    
-        cell.className = 'cell';
-
-        // Check if there's a snake at this position
         if (snakes[i]) {
-            cell.classList.add('snake');
+            const snakeImg = document.createElement('img');
+            snakeImg.src = 'images/icons8-vampire-48.png';
+            snakeImg.className = 'snake';
+            cell.appendChild(snakeImg);
+        }
+        if (i==totalCells) {
+            const nezukoImg = document.createElement('img');
+            nezukoImg.src = 'images/nezuko.jpg';
+            nezukoImg.className = 'nezuko';
+            cell.appendChild(nezukoImg);
         }
 
-        // Check if there's a ladder at this position
         if (ladders[i]) {
-            cell.classList.add('ladder');
+            const ladderImg = document.createElement('img');
+            ladderImg.src = 'images/icons8-ladder-50.png';
+            ladderImg.className = 'ladder';
+            cell.appendChild(ladderImg);
         }
 
-        // Check if there's a demon at this position
-        if (demons[i]) {
-            cell.classList.add('demon');
+        if (i === playerPosition) {
+            const playerImg = document.createElement('img');
+            playerImg.src = 'images/icons8-tanjiro-kamado.svg';
+            playerImg.className = 'player-icon';
+            cell.appendChild(playerImg);
         }
-
-        // Add Nezuko's image if it's the final position
-        if (i === totalCells) {
-            cell.classList.add('nezuko');
-        }
-       
 
         board.appendChild(cell);
     }
 }
 
-
 function rollDice() {
-    return Math.floor(Math.random() * 6) + 1;
+    const diceResult = Math.floor(Math.random() * 6) + 1;
+    document.getElementById('diceResult').textContent = `You rolled: ${diceResult}`;
+    movePlayer(diceResult);
 }
 
-function movePlayer() {
-    const diceValue = rollDice();
-    diceResult.textContent = `Dice: ${diceValue}`;
+function movePlayer(steps) {
+    playerPosition += steps;
 
-    let newPosition = playerPosition + diceValue;
-
-    // Check if the new position encounters snakes, ladders, or demons
-    while (newPosition in snakes || newPosition in ladders || newPosition in demons) {
-        if (newPosition in snakes) {
-            newPosition = snakes[newPosition];
-            newPosition -= Math.floor(newPosition / 2); // Move back half the cell value
-        } else if (newPosition in ladders) {
-            newPosition = ladders[newPosition];
-        } else if (newPosition in demons) {
-            // Handle demon effect, move back half the cell value
-            newPosition -= Math.floor(newPosition / 2);
-        }
+    if (playerPosition > totalCells) {
+        playerPosition = totalCells - (playerPosition - totalCells);
     }
 
-    // Ensure Tanjiro's position does not exceed the board size
-    playerPosition = Math.min(newPosition, totalCells);
+    if (snakes[playerPosition]) {
+        playerPosition = snakes[playerPosition];
+    }
 
-    // Check if Tanjiro reached Nezuko
+    if (ladders[playerPosition]) {
+        playerPosition = ladders[playerPosition];
+    }
+
+    createBoard();
+
     if (playerPosition === totalCells) {
         alert('Congratulations! Tanjiro reached Nezuko.');
         resetGame();
-    }
-
-    // Update player position text
-    playerPositionText.textContent = `Tanjiro's Position: ${playerPosition}`;
-
-    // Update Tanjiro's position on the board
-    updatePlayerPosition();
-}
-
-function updatePlayerPosition() {
-    const cells = document.querySelectorAll('.cell');
-    cells.forEach(cell => {
-        cell.innerHTML = ''; // Clear all cells
-    });
-
-    const currentCell = document.querySelector(`.cell:nth-child(${totalCells - playerPosition + 1})`);
-    if (currentCell) {
-        const tanjiroImg = document.createElement('div');
-        tanjiroImg.className = 'player-icon';
-        currentCell.appendChild(tanjiroImg);
     }
 }
 
 function resetGame() {
     playerPosition = 1;
-    playerPositionText.textContent = `Tanjiro's Position: ${playerPosition}`;
-    diceResult.textContent = 'Dice: ';
-    updatePlayerPosition();
+    document.getElementById('diceResult').textContent = 'Dice: ';
+    createBoard();
 }
 
-rollDiceBtn.addEventListener('click', movePlayer);
-
 createBoard();
-updatePlayerPosition();
